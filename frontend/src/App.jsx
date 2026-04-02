@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from "react";
 
 // const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const API_BASE = "https://potholeapp.onrender.com";
+console.log(API_BASE);
 const TABS = ["Image", "Video"];
 
 export default function App() {
