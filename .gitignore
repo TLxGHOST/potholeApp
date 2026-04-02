@@ -1,5 +1,15 @@
 __pycache__/
+*.py[cod]
 *.pt
-*node_modules
-node_modules
+*.pth
+*.onnx
+.env
 .env.local
+node_modules/
+dist/
+.venv/
+venv/
+*.mp4
+*.avi
+*.mov
+tmp_*
