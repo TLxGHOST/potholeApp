@@ -39,6 +39,7 @@ export default function App() {
   // ── Submit ──────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!file) return;
+    console.log("handleSubmit fired, file:", file.name);
     setLoading(true);
     setError(null);
     setResult(null);
