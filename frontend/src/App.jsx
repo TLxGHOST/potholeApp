@@ -48,21 +48,40 @@ export default function App() {
     fd.append("file", file);
 
     try {
+      // if (tab === "Image") {
+      //   setProgress("Running detection…");
+      //   const res = await fetch(`${API_BASE}/detect/image`, {
+      //     method: "POST",
+      //     body: fd,
+      //   });
+      //   if (!res.ok) throw new Error(await res.text());
+      //   const json = await res.json();
+      //   setResult({
+      //     type: "image",
+      //     detections: json.detections,
+      //     width: json.width,
+      //     height: json.height,
+      //   });
+      //   // Draw boxes after state update (use timeout so canvas is rendered)
+      //   setTimeout(() => drawBoxes(json.detections), 50);
+      // }
       if (tab === "Image") {
         setProgress("Running detection…");
+        console.log("Sending to:", `${API_BASE}/detect/image`);
         const res = await fetch(`${API_BASE}/detect/image`, {
           method: "POST",
           body: fd,
         });
-        if (!res.ok) throw new Error(await res.text());
+        console.log("Response status:", res.status);
         const json = await res.json();
+        console.log("Response JSON:", json);
+        if (!res.ok) throw new Error(JSON.stringify(json));
         setResult({
           type: "image",
           detections: json.detections,
           width: json.width,
           height: json.height,
         });
-        // Draw boxes after state update (use timeout so canvas is rendered)
         setTimeout(() => drawBoxes(json.detections), 50);
       } else {
         setProgress("Uploading video…");
