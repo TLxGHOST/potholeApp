@@ -30,15 +30,32 @@ FRAME_SIZE = (640, 384)
 @app.on_event("startup")
 async def load_model():
     global model
-    # HuggingFace hub caches to ~/.cache/huggingface by default.
-    # On Render free tier there is no persistent disk, but the cache
-    # survives for the lifetime of the running container (hours), so
-    # repeated requests within the same session are instant.
+
+    # ── Torch 2.6+ safety patch ────────────────────────────────────────────
+    # PyTorch 2.6 changed torch.load() to default weights_only=True, which
+    # blocks YOLO's custom classes. We allowlist them explicitly so the load
+    # succeeds without falling back to unsafe pickle execution.
+    import torch
+    import ultralytics.nn.tasks as _tasks
+    import ultralytics.nn.modules as _modules
+
+    _safe = [
+        _tasks.DetectionModel,
+        _tasks.SegmentationModel,
+        _tasks.ClassificationModel,
+        _tasks.PoseModel,
+    ]
+    # add_safe_globals is available from torch 2.6+; guard for older builds
+    if hasattr(torch.serialization, "add_safe_globals"):
+        torch.serialization.add_safe_globals(_safe)
+
+    # ── Download from HuggingFace Hub ─────────────────────────────────────
+    # Cache lives in ~/.cache/huggingface for the container's lifetime.
     print("Downloading / loading model from HuggingFace Hub…")
     downloaded = hf_hub_download(
-        repo_id=os.environ["HF_REPO_ID"],   # e.g. "yourname/pothole-model"
+        repo_id=os.environ["HF_REPO_ID"],
         filename="Nano_model.pt",
-        token=os.environ.get("HF_TOKEN"),   # leave unset if repo is public
+        token=os.environ.get("HF_TOKEN"),
     )
     print(f"Model path: {downloaded}")
     model = YOLO(downloaded)
